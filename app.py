@@ -704,7 +704,10 @@ def api_cart_count():
               (current_user.id,), one=True)['c']
     return jsonify({'count': c})
 
+# ─── Inicializar base de datos al cargar la app ──────────────
+with app.app_context():
+    init_db()
 # ─── Run ────────────────────────────────────────────────────────
 if __name__ == '__main__':
-    init_db()
+#    init_db()
     app.run(debug=True, host='0.0.0.0', port=5000)
