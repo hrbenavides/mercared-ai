@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block topbar_title %}Mi Perfil{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div><h1>👤 Mi Perfil</h1><p>Administra tu información personal y de cuenta.</p></div>
+</div>
+
+<div class="grid-2" style="align-items:start">
+  <!-- Avatar card -->
+  <div style="display:flex;flex-direction:column;gap:20px">
+    <div class="card" style="text-align:center;padding:32px">
+      <div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--purple));display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:900;color:#fff;margin:0 auto 16px">
+        {{ current_user.avatar_initials }}
+      </div>
+      <div style="font-size:20px;font-weight:800;color:var(--ink)">{{ current_user.full_name }}</div>
+      <div style="font-size:14px;color:var(--muted);margin-top:4px">{{ current_user.email }}</div>
+      <div style="margin-top:10px">
+        <span style="background:rgba(37,99,235,.1);color:var(--blue);font-size:12px;font-weight:700;padding:4px 14px;border-radius:100px;border:1px solid rgba(37,99,235,.2)">
+          {{ ROLE_ICONS[current_user.role] }} {{ ROLE_LABELS[current_user.role] }}
+        </span>
+      </div>
+      {% if current_user.company %}
+      <div style="margin-top:12px;font-size:14px;color:var(--muted)">🏢 {{ current_user.company }}</div>
+      {% endif %}
+      {% if current_user.city %}
+      <div style="font-size:13px;color:var(--muted);margin-top:4px">📍 {{ current_user.city }}</div>
+      {% endif %}
+      {% if current_user.bio %}
+      <div style="margin-top:14px;font-size:13px;color:var(--muted);font-style:italic;line-height:1.6">{{ current_user.bio }}</div>
+      {% endif %}
+      <div style="margin-top:16px;font-size:11px;color:var(--muted)">Miembro desde {{ current_user.created_at[:10] }}</div>
+    </div>
+
+    <div style="background:linear-gradient(135deg,#EFF6FF,#F5F3FF);border:1px solid #BFDBFE;border-radius:var(--r-lg);padding:20px">
+      <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--blue);margin-bottom:10px">🔐 Seguridad de cuenta</div>
+      <p style="font-size:13px;color:var(--muted);line-height:1.6">Tu cuenta está protegida con contraseña encriptada. Puedes cambiarla en el formulario de la derecha.</p>
+    </div>
+  </div>
+
+  <!-- Edit form -->
+  <div class="card">
+    <div class="card-title">✏️ Editar información</div>
+    <form method="POST" action="{{ url_for('profile') }}">
+      <div class="grid-2" style="gap:12px">
+        <div class="form-group">
+          <label class="form-label">Nombre completo</label>
+          <input type="text" name="full_name" class="form-control" value="{{ user_data['full_name'] }}" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Ciudad</label>
+          <select name="city" class="form-control">
+            {% for c in ['La Paz','El Alto','Cochabamba','Santa Cruz','Oruro','Sucre','Potosí','Trinidad','Cobija'] %}
+            <option {% if user_data['city']==c %}selected{% endif %}>{{ c }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Empresa / Nombre del negocio</label>
+        <input type="text" name="company" class="form-control" value="{{ user_data['company'] or '' }}" placeholder="Nombre de tu empresa">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Teléfono</label>
+        <input type="tel" name="phone" class="form-control" value="{{ user_data['phone'] or '' }}" placeholder="+591-7XXXXXXX">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Descripción / Bio</label>
+        <textarea name="bio" class="form-control" rows="3" placeholder="Cuéntanos sobre tu negocio...">{{ user_data['bio'] or '' }}</textarea>
+      </div>
+
+      <div style="border-top:1px solid var(--border);padding-top:16px;margin-top:4px">
+        <div class="card-title" style="margin-bottom:12px">🔑 Cambiar contraseña</div>
+        <div class="grid-2" style="gap:12px">
+          <div class="form-group">
+            <label class="form-label">Nueva contraseña</label>
+            <input type="password" name="new_password" class="form-control" placeholder="Mínimo 6 caracteres" minlength="6" id="newPw">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Confirmar nueva contraseña</label>
+            <input type="password" class="form-control" placeholder="Repite la contraseña" id="confPw" oninput="checkPwMatch()">
+          </div>
+        </div>
+        <div id="pwHint" style="font-size:12px;margin-bottom:12px"></div>
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width:100%">💾 Guardar cambios</button>
+    </form>
+  </div>
+</div>
+
+<script>
+function checkPwMatch(){
+  const a=document.getElementById('newPw').value, b=document.getElementById('confPw').value, h=document.getElementById('pwHint');
+  if(!b) return h.textContent='';
+  if(a===b){h.textContent='✓ Las contraseñas coinciden';h.style.color='var(--green)'}
+  else{h.textContent='✗ No coinciden';h.style.color='var(--red)'}
+}
+</script>
+{% endblock %}

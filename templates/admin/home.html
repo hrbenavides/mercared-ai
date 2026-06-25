@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block topbar_title %}Panel Administrador{% endblock %}
+{% block content %}
+<div class="page-header"><div><h1>⚙️ Administración</h1><p>Vista global del sistema MercaRed AI.</p></div></div>
+
+<div class="grid-4" style="margin-bottom:24px">
+  <div class="kpi blue"><div class="kpi-icon">👥</div><div class="kpi-val">{{ stats.users }}</div><div class="kpi-label">Usuarios registrados</div></div>
+  <div class="kpi purple"><div class="kpi-icon">📋</div><div class="kpi-val">{{ stats.products }}</div><div class="kpi-label">Productos activos</div></div>
+  <div class="kpi amber"><div class="kpi-icon">📦</div><div class="kpi-val">{{ stats.orders }}</div><div class="kpi-label">Pedidos totales</div></div>
+  <div class="kpi green"><div class="kpi-icon">💰</div><div class="kpi-val">Bs.{{ '%.0f'|format(stats.revenue) }}</div><div class="kpi-label">Ingresos totales</div></div>
+</div>
+
+<!-- Users -->
+<div class="card" style="margin-bottom:20px">
+  <div class="card-title">👥 Usuarios del sistema</div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>ID</th><th>Nombre</th><th>Correo</th><th>Rol</th><th>Ciudad</th><th>Registro</th><th>Estado</th><th>Acción</th></tr></thead>
+      <tbody>
+        {% for u in users %}
+        <tr>
+          <td style="color:var(--muted);font-weight:700">#{{ u.id }}</td>
+          <td>
+            <div style="font-weight:700;font-size:13px">{{ u.full_name }}</div>
+            {% if u.company %}<div style="font-size:11px;color:var(--muted)">{{ u.company }}</div>{% endif %}
+          </td>
+          <td style="font-size:12px">{{ u.email }}</td>
+          <td>
+            <span style="font-size:12px;font-weight:700">
+              {{ ROLE_ICONS[u.role] }} {{ ROLE_LABELS[u.role] }}
+            </span>
+          </td>
+          <td style="font-size:12px;color:var(--muted)">{{ u.city }}</td>
+          <td style="font-size:12px;color:var(--muted)">{{ u.created_at[:10] }}</td>
+          <td>
+            {% if u.is_active %}
+            <span class="status s-delivered">Activo</span>
+            {% else %}
+            <span class="status s-cancelled">Inactivo</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if u.id != current_user.id %}
+            <form method="POST" action="{{ url_for('admin_toggle_user', uid=u.id) }}">
+              <button type="submit" class="btn btn-sm {% if u.is_active %}btn-warning{% else %}btn-success{% endif %}">
+                {% if u.is_active %}Desactivar{% else %}Activar{% endif %}
+              </button>
+            </form>
+            {% else %}
+            <span style="font-size:12px;color:var(--muted)">Tú</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Recent orders -->
+<div class="card">
+  <div class="card-title">📦 Pedidos recientes del sistema</div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>#</th><th>Comprador</th><th>Vendedor</th><th>Total</th><th>Estado</th><th>Fecha</th></tr></thead>
+      <tbody>
+        {% for o in orders %}
+        <tr>
+          <td style="font-weight:800;color:var(--muted)">#{{ '%04d'|format(o.id) }}</td>
+          <td style="font-size:13px;font-weight:600">{{ o.buyer }}</td>
+          <td style="font-size:13px;font-weight:600">{{ o.seller }}</td>
+          <td style="font-weight:800">Bs. {{ '%.2f'|format(o.total) }}</td>
+          <td><span class="status s-{{ o.status }}">{{ {'pending':'Pendiente','confirmed':'Confirmado','preparing':'Preparando','in_transit':'En camino','delivered':'Entregado','cancelled':'Cancelado'}[o.status] }}</span></td>
+          <td style="font-size:12px;color:var(--muted)">{{ o.created_at[:16] }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

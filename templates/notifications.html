@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block topbar_title %}Notificaciones{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div><h1>🔔 Notificaciones</h1><p>Todas tus alertas y actualizaciones.</p></div>
+</div>
+
+{% if notifs %}
+<div style="display:flex;flex-direction:column;gap:10px;max-width:760px">
+  {% for n in notifs %}
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px 20px;display:flex;gap:14px;align-items:flex-start;box-shadow:0 1px 3px rgba(15,23,42,.06);{% if not n.is_read %}border-left:3px solid var(--blue){% endif %}">
+    <div style="font-size:24px;flex-shrink:0">
+      {% if n.type=='success' %}✅
+      {% elif n.type=='warning' %}⚠️
+      {% elif n.type=='error' %}❌
+      {% else %}ℹ️{% endif %}
+    </div>
+    <div style="flex:1">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+        <div style="font-size:15px;font-weight:700;color:var(--ink)">{{ n.title }}</div>
+        {% if not n.is_read %}
+        <span style="background:var(--blue);color:#fff;font-size:10px;font-weight:800;padding:2px 8px;border-radius:100px;flex-shrink:0">NUEVO</span>
+        {% endif %}
+      </div>
+      {% if n.body %}
+      <div style="font-size:14px;color:var(--muted);margin-top:5px;line-height:1.6">{{ n.body }}</div>
+      {% endif %}
+      <div style="font-size:11px;color:var(--muted);margin-top:8px">{{ n.created_at[:16] }}</div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty">
+  <div class="empty-icon">🔔</div>
+  <h3>Sin notificaciones</h3>
+  <p>No hay notificaciones en este momento. Todo al día.</p>
+</div>
+{% endif %}
+{% endblock %}

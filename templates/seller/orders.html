@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block topbar_title %}Pedidos Recibidos{% endblock %}
+{% block content %}
+<div class="page-header"><div><h1>📦 Pedidos recibidos</h1><p>Gestiona los pedidos de tus compradores.</p></div></div>
+{% if orders %}
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>#</th><th>Comprador</th><th>Dirección</th><th>Total</th><th>Fecha</th><th>Estado</th><th>Actualizar estado</th></tr></thead>
+    <tbody>
+      {% for o in orders %}
+      <tr>
+        <td style="font-weight:800;color:var(--muted)">#{{ '%04d'|format(o.id) }}</td>
+        <td>
+          <div style="font-weight:700;font-size:13px">{{ o.buyer_company or o.buyer_name }}</div>
+          {% if o.buyer_phone %}<div style="font-size:11px;color:var(--muted)">📞 {{ o.buyer_phone }}</div>{% endif %}
+        </td>
+        <td style="font-size:12px;color:var(--muted);max-width:140px">{{ o.delivery_address or '—' }}</td>
+        <td style="font-weight:800">Bs. {{ '%.2f'|format(o.total) }}</td>
+        <td style="font-size:12px;color:var(--muted)">{{ o.created_at[:16] }}</td>
+        <td><span class="status s-{{ o.status }}">{{ {'pending':'Pendiente','confirmed':'Confirmado','preparing':'Preparando','in_transit':'En camino','delivered':'Entregado','cancelled':'Cancelado'}[o.status] }}</span></td>
+        <td>
+          {% if o.status not in ['delivered','cancelled'] %}
+          <form method="POST" action="{{ url_for('seller_order_update', oid=o.id) }}" style="display:flex;gap:6px">
+            <select name="status" class="form-control" style="padding:6px 10px;font-size:12px">
+              {% for s,l in [('confirmed','Confirmar'),('preparing','Preparando'),('in_transit','En camino'),('delivered','Entregado'),('cancelled','Cancelar')] %}
+                {% if s != o.status %}<option value="{{ s }}">{{ l }}</option>{% endif %}
+              {% endfor %}
+            </select>
+            <button type="submit" class="btn btn-primary btn-sm">✓</button>
+          </form>
+          {% else %}
+          <span style="font-size:12px;color:var(--muted)">Finalizado</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="empty"><div class="empty-icon">📦</div><h3>Sin pedidos recibidos</h3><p>Los pedidos de los compradores aparecerán aquí.</p></div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}MercaRed AI{% endblock %}</title>
+<style>
+/* ── TOKENS ─────────────────────────────────────────────── */
+:root{
+  --ink:#0F172A;--blue:#2563EB;--blue-d:#1D4ED8;--blue-l:#3B82F6;
+  --amber:#F59E0B;--amber-d:#D97706;
+  --green:#10B981;--red:#EF4444;--purple:#8B5CF6;
+  --surface:#F8FAFC;--card:#FFFFFF;--muted:#64748B;--border:#E2E8F0;
+  --sidebar-w:240px;
+  --nav-h:60px;
+  --r:10px;--r-lg:16px;
+  --sh:0 1px 3px rgba(15,23,42,.08),0 1px 2px rgba(15,23,42,.04);
+  --sh-md:0 4px 16px rgba(15,23,42,.10);
+  --sh-lg:0 20px 48px rgba(15,23,42,.14);
+  --font:'Segoe UI',system-ui,-apple-system,sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--surface);color:var(--ink);line-height:1.6;min-height:100vh}
+a{text-decoration:none;color:inherit}
+button,input,select,textarea{font-family:var(--font)}
+img{max-width:100%}
+
+/* ── LAYOUT ─────────────────────────────────────────────── */
+.app-layout{display:flex;min-height:100vh}
+.sidebar{
+  width:var(--sidebar-w);flex-shrink:0;
+  background:var(--ink);
+  display:flex;flex-direction:column;
+  position:fixed;top:0;left:0;bottom:0;z-index:200;
+  transition:transform .25s;
+}
+.main-wrap{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column;min-height:100vh}
+.topbar{
+  height:var(--nav-h);background:var(--card);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 24px;gap:16px;
+  position:sticky;top:0;z-index:100;box-shadow:var(--sh);
+}
+.page-content{flex:1;padding:28px 28px 48px}
+
+/* ── SIDEBAR ─────────────────────────────────────────────── */
+.sidebar-logo{
+  padding:20px 20px 16px;border-bottom:1px solid rgba(255,255,255,.08);
+  display:flex;align-items:center;gap:10px;
+}
+.logo-icon{
+  width:34px;height:34px;border-radius:8px;
+  background:linear-gradient(135deg,var(--blue),#7C3AED);
+  display:flex;align-items:center;justify-content:center;
+  font-size:15px;font-weight:900;color:#fff;letter-spacing:-1px;flex-shrink:0;
+}
+.logo-text{font-size:17px;font-weight:800;color:#fff}
+.logo-text span{color:var(--blue-l)}
+.logo-text small{font-size:9px;font-weight:700;color:var(--amber);margin-left:2px}
+
+.sidebar-user{
+  padding:14px 16px;margin:10px 10px 0;
+  background:rgba(255,255,255,.06);border-radius:var(--r);
+  display:flex;align-items:center;gap:10px;
+}
+.avatar{
+  width:36px;height:36px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:800;color:#fff;
+  background:linear-gradient(135deg,var(--blue),var(--purple));
+}
+.user-name{font-size:13px;font-weight:700;color:#fff;line-height:1.2}
+.user-role{font-size:11px;color:rgba(255,255,255,.45)}
+
+.sidebar-nav{flex:1;padding:10px 10px;overflow-y:auto}
+.nav-section-label{
+  font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+  color:rgba(255,255,255,.3);padding:10px 10px 6px;
+}
+.nav-link{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 12px;border-radius:var(--r);margin-bottom:2px;
+  font-size:13px;font-weight:500;color:rgba(255,255,255,.6);
+  transition:background .15s,color .15s;cursor:pointer;
+}
+.nav-link:hover{background:rgba(255,255,255,.07);color:rgba(255,255,255,.9)}
+.nav-link.active{background:rgba(37,99,235,.3);color:#fff;font-weight:600}
+.nav-link .icon{font-size:16px;width:20px;text-align:center;flex-shrink:0}
+.nav-link .badge{
+  margin-left:auto;background:var(--blue);color:#fff;
+  font-size:10px;font-weight:800;padding:1px 7px;border-radius:100px;
+}
+.nav-link .badge.amber{background:var(--amber)}
+
+.sidebar-bottom{
+  padding:10px;border-top:1px solid rgba(255,255,255,.08);
+}
+
+/* ── TOPBAR ──────────────────────────────────────────────── */
+.topbar-hamburger{
+  display:none;flex-direction:column;gap:4px;
+  background:none;border:none;cursor:pointer;padding:6px;
+}
+.topbar-hamburger span{display:block;width:20px;height:2px;background:var(--muted);border-radius:2px}
+.topbar-title{font-size:16px;font-weight:700;color:var(--ink)}
+.topbar-right{display:flex;align-items:center;gap:10px;margin-left:auto}
+.topbar-btn{
+  width:36px;height:36px;border-radius:var(--r);border:1px solid var(--border);
+  background:var(--card);display:flex;align-items:center;justify-content:center;
+  font-size:16px;cursor:pointer;position:relative;transition:background .15s;
+}
+.topbar-btn:hover{background:var(--surface)}
+.notif-dot{
+  position:absolute;top:4px;right:4px;
+  width:8px;height:8px;border-radius:50%;background:var(--red);
+  border:2px solid var(--card);
+}
+.topbar-avatar{
+  width:34px;height:34px;border-radius:50%;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:800;color:#fff;
+  background:linear-gradient(135deg,var(--blue),var(--purple));
+}
+
+/* ── FLASH ───────────────────────────────────────────────── */
+.flash-container{padding:0 28px;margin-top:16px}
+.flash{
+  display:flex;align-items:center;gap:10px;
+  padding:12px 16px;border-radius:var(--r);font-size:14px;font-weight:500;
+  margin-bottom:8px;border:1px solid;
+}
+.flash.success{background:#F0FDF4;color:#065F46;border-color:#A7F3D0}
+.flash.error{background:#FEF2F2;color:#7F1D1D;border-color:#FECACA}
+.flash.info{background:#EFF6FF;color:#1E3A8A;border-color:#BFDBFE}
+.flash.warning{background:#FFFBEB;color:#78350F;border-color:#FDE68A}
+.flash-close{margin-left:auto;cursor:pointer;opacity:.6;font-size:16px;background:none;border:none;color:inherit}
+
+/* ── CARDS / GRID ────────────────────────────────────────── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;box-shadow:var(--sh)}
+.card-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:14px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.grid-auto{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}
+
+/* ── KPI WIDGET ──────────────────────────────────────────── */
+.kpi{
+  background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);
+  padding:20px 20px 18px;box-shadow:var(--sh);position:relative;overflow:hidden;
+}
+.kpi::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px}
+.kpi.blue::after{background:var(--blue)}
+.kpi.green::after{background:var(--green)}
+.kpi.amber::after{background:var(--amber)}
+.kpi.purple::after{background:var(--purple)}
+.kpi.red::after{background:var(--red)}
+.kpi-icon{font-size:24px;margin-bottom:10px}
+.kpi-val{font-size:30px;font-weight:900;line-height:1;color:var(--ink)}
+.kpi-label{font-size:12px;color:var(--muted);margin-top:6px;font-weight:500}
+.kpi-trend{font-size:12px;font-weight:700;margin-top:4px}
+.kpi-trend.up{color:var(--green)}
+.kpi-trend.neutral{color:var(--muted)}
+
+/* ── TABLE ───────────────────────────────────────────────── */
+.table-wrap{overflow-x:auto;border-radius:var(--r-lg);border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead{background:var(--surface)}
+th{padding:10px 16px;text-align:left;font-size:11px;font-weight:700;
+   text-transform:uppercase;letter-spacing:.7px;color:var(--muted);border-bottom:1px solid var(--border)}
+td{padding:12px 16px;border-bottom:1px solid var(--border);color:var(--ink);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#FAFBFC}
+
+/* ── BADGE / STATUS ──────────────────────────────────────── */
+.status{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:3px 10px;border-radius:100px}
+.status::before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor}
+.s-pending{background:rgba(245,158,11,.1);color:var(--amber-d)}
+.s-confirmed{background:rgba(37,99,235,.1);color:var(--blue)}
+.s-preparing{background:rgba(139,92,246,.1);color:var(--purple)}
+.s-in_transit{background:rgba(6,182,212,.1);color:#0891B2}
+.s-delivered{background:rgba(16,185,129,.1);color:var(--green)}
+.s-cancelled{background:rgba(239,68,68,.1);color:var(--red)}
+
+/* ── FORM ────────────────────────────────────────────────── */
+.form-group{margin-bottom:16px}
+.form-label{display:block;font-size:13px;font-weight:600;color:var(--ink);margin-bottom:6px}
+.form-label span{color:var(--red)}
+.form-control{
+  width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--r);
+  font-size:14px;color:var(--ink);background:var(--card);
+  transition:border-color .15s,box-shadow .15s;outline:none;
+}
+.form-control:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+.form-hint{font-size:11px;color:var(--muted);margin-top:4px}
+
+/* ── BTN ─────────────────────────────────────────────────── */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  font-size:14px;font-weight:600;padding:9px 18px;border-radius:var(--r);
+  border:none;cursor:pointer;transition:all .15s;line-height:1;
+}
+.btn-primary{background:var(--blue);color:#fff}
+.btn-primary:hover{background:var(--blue-d);transform:translateY(-1px);box-shadow:0 4px 12px rgba(37,99,235,.3)}
+.btn-success{background:var(--green);color:#fff}
+.btn-success:hover{background:#059669}
+.btn-danger{background:var(--red);color:#fff}
+.btn-danger:hover{background:#DC2626}
+.btn-warning{background:var(--amber);color:#fff}
+.btn-warning:hover{background:var(--amber-d)}
+.btn-ghost{background:transparent;color:var(--ink);border:1px solid var(--border)}
+.btn-ghost:hover{background:var(--surface)}
+.btn-sm{font-size:12px;padding:6px 12px}
+.btn-icon{width:32px;height:32px;padding:0;border-radius:var(--r)}
+
+/* ── PAGE HEADER ──────────────────────────────────────────── */
+.page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;gap:16px;flex-wrap:wrap}
+.page-header h1{font-size:22px;font-weight:800;color:var(--ink)}
+.page-header p{font-size:13px;color:var(--muted);margin-top:2px}
+
+/* ── EMPTY STATE ──────────────────────────────────────────── */
+.empty{text-align:center;padding:48px 24px;color:var(--muted)}
+.empty-icon{font-size:48px;margin-bottom:12px;opacity:.5}
+.empty h3{font-size:16px;font-weight:700;margin-bottom:6px;color:var(--ink)}
+.empty p{font-size:14px}
+
+/* ── RESPONSIVE ───────────────────────────────────────────── */
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:none}
+  .main-wrap{margin-left:0}
+  .topbar-hamburger{display:flex}
+  .grid-2,.grid-3,.grid-4{grid-template-columns:1fr}
+  .page-content{padding:16px 16px 40px}
+  .flash-container{padding:0 16px}
+}
+</style>
+</head>
+<body>
+
+{% if current_user.is_authenticated %}
+<div class="app-layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">M</div>
+      <div class="logo-text">Merca<span>Red</span><small>AI</small></div>
+    </div>
+
+    <div class="sidebar-user">
+      <div class="avatar">{{ current_user.avatar_initials }}</div>
+      <div>
+        <div class="user-name">{{ current_user.full_name }}</div>
+        <div class="user-role">{{ ROLE_ICONS[current_user.role] }} {{ ROLE_LABELS[current_user.role] }}</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      {% if current_user.role == 'buyer' %}
+        <div class="nav-section-label">Principal</div>
+        <a href="{{ url_for('buyer_home') }}" class="nav-link {% if request.endpoint=='buyer_home' %}active{% endif %}">
+          <span class="icon">🏠</span> Inicio
+        </a>
+        <a href="{{ url_for('buyer_catalogue') }}" class="nav-link {% if request.endpoint=='buyer_catalogue' %}active{% endif %}">
+          <span class="icon">🛍️</span> Catálogo
+        </a>
+        <a href="{{ url_for('buyer_cart') }}" class="nav-link {% if request.endpoint=='buyer_cart' %}active{% endif %}">
+          <span class="icon">🛒</span> Carrito
+          {% set cc = notif_count() %}
+        </a>
+        <a href="{{ url_for('buyer_orders') }}" class="nav-link {% if 'buyer_order' in request.endpoint %}active{% endif %}">
+          <span class="icon">📦</span> Mis Pedidos
+        </a>
+
+      {% elif current_user.role == 'seller' %}
+        <div class="nav-section-label">Principal</div>
+        <a href="{{ url_for('seller_home') }}" class="nav-link {% if request.endpoint=='seller_home' %}active{% endif %}">
+          <span class="icon">🏠</span> Dashboard
+        </a>
+        <a href="{{ url_for('seller_products') }}" class="nav-link {% if request.endpoint=='seller_products' %}active{% endif %}">
+          <span class="icon">📋</span> Mis Productos
+        </a>
+        <a href="{{ url_for('seller_orders') }}" class="nav-link {% if request.endpoint=='seller_orders' %}active{% endif %}">
+          <span class="icon">📦</span> Pedidos Recibidos
+        </a>
+
+      {% elif current_user.role == 'transporter' %}
+        <div class="nav-section-label">Principal</div>
+        <a href="{{ url_for('transporter_home') }}" class="nav-link {% if request.endpoint=='transporter_home' %}active{% endif %}">
+          <span class="icon">🚚</span> Mis Entregas
+        </a>
+
+      {% elif current_user.role == 'admin' %}
+        <div class="nav-section-label">Administración</div>
+        <a href="{{ url_for('admin_home') }}" class="nav-link {% if request.endpoint=='admin_home' %}active{% endif %}">
+          <span class="icon">⚙️</span> Panel Admin
+        </a>
+      {% endif %}
+
+      <div class="nav-section-label" style="margin-top:10px">Cuenta</div>
+      <a href="{{ url_for('notifications') }}" class="nav-link {% if request.endpoint=='notifications' %}active{% endif %}">
+        <span class="icon">🔔</span> Notificaciones
+        {% set nc = notif_count() %}{% if nc > 0 %}<span class="badge amber">{{ nc }}</span>{% endif %}
+      </a>
+      <a href="{{ url_for('profile') }}" class="nav-link {% if request.endpoint=='profile' %}active{% endif %}">
+        <span class="icon">👤</span> Mi Perfil
+      </a>
+    </nav>
+
+    <div class="sidebar-bottom">
+      <a href="{{ url_for('logout') }}" class="nav-link" style="color:rgba(239,68,68,.7)">
+        <span class="icon">🚪</span> Cerrar sesión
+      </a>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main-wrap">
+    <header class="topbar">
+      <button class="topbar-hamburger" id="hamburger">
+        <span></span><span></span><span></span>
+      </button>
+      <span class="topbar-title">{% block topbar_title %}MercaRed AI{% endblock %}</span>
+      <div class="topbar-right">
+        <a href="{{ url_for('notifications') }}" class="topbar-btn" title="Notificaciones">
+          🔔
+          {% if notif_count() > 0 %}<div class="notif-dot"></div>{% endif %}
+        </a>
+        <a href="{{ url_for('profile') }}" class="topbar-avatar">{{ current_user.avatar_initials }}</a>
+      </div>
+    </header>
+
+    {% with msgs = get_flashed_messages(with_categories=true) %}
+      {% if msgs %}
+        <div class="flash-container">
+          {% for cat, msg in msgs %}
+            <div class="flash {{ cat }}">
+              {% if cat=='success' %}✅{% elif cat=='error' %}❌{% elif cat=='warning' %}⚠️{% else %}ℹ️{% endif %}
+              {{ msg }}
+              <button class="flash-close" onclick="this.parentElement.remove()">✕</button>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <main class="page-content">
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+</div>
+
+<script>
+const hamburger = document.getElementById('hamburger');
+const sidebar   = document.getElementById('sidebar');
+hamburger?.addEventListener('click', () => sidebar.classList.toggle('open'));
+document.addEventListener('click', e => {
+  if (window.innerWidth <= 768 && sidebar.classList.contains('open')
+      && !sidebar.contains(e.target) && !hamburger.contains(e.target))
+    sidebar.classList.remove('open');
+});
+</script>
+
+{% else %}
+  {% block public_content %}{% endblock %}
+{% endif %}
+
+{% block extra_scripts %}{% endblock %}
+</body>
+</html>

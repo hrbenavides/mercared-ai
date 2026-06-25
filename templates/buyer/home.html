@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+{% block topbar_title %}Mi Dashboard{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div>
+    <h1>Hola, {{ current_user.full_name.split()[0] }} 👋</h1>
+    <p>{{ current_user.company or 'Bienvenido a MercaRed AI' }} · {{ current_user.city }}</p>
+  </div>
+  <a href="{{ url_for('buyer_catalogue') }}" class="btn btn-primary">🛍️ Ir al catálogo</a>
+</div>
+
+<!-- KPIs -->
+<div class="grid-4" style="margin-bottom:24px">
+  <div class="kpi blue">
+    <div class="kpi-icon">📦</div>
+    <div class="kpi-val">{{ stats.total_orders }}</div>
+    <div class="kpi-label">Pedidos totales</div>
+  </div>
+  <div class="kpi green">
+    <div class="kpi-icon">✅</div>
+    <div class="kpi-val">{{ stats.delivered }}</div>
+    <div class="kpi-label">Entregados</div>
+  </div>
+  <div class="kpi amber">
+    <div class="kpi-icon">⏳</div>
+    <div class="kpi-val">{{ stats.pending }}</div>
+    <div class="kpi-label">En proceso</div>
+  </div>
+  <div class="kpi purple">
+    <div class="kpi-icon">🛒</div>
+    <div class="kpi-val">{{ cart_count }}</div>
+    <div class="kpi-label">En carrito</div>
+    {% if cart_count > 0 %}
+    <a href="{{ url_for('buyer_cart') }}" style="font-size:11px;color:var(--blue);font-weight:700;display:block;margin-top:6px">Ver carrito →</a>
+    {% endif %}
+  </div>
+</div>
+
+<div class="grid-2">
+  <!-- Pedidos recientes -->
+  <div class="card">
+    <div class="card-title">📦 Pedidos recientes</div>
+    {% if orders %}
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>Proveedor</th><th>Total</th><th>Estado</th><th></th></tr></thead>
+          <tbody>
+            {% for o in orders %}
+            <tr>
+              <td style="font-weight:700;color:var(--muted)">#{{ '%04d'|format(o.id) }}</td>
+              <td>
+                <div style="font-weight:600;font-size:13px">{{ o.seller_company or o.seller_name }}</div>
+                <div style="font-size:11px;color:var(--muted)">{{ o.created_at[:10] }}</div>
+              </td>
+              <td style="font-weight:700">Bs. {{ '%.2f'|format(o.total) }}</td>
+              <td><span class="status s-{{ o.status }}">{{ {'pending':'Pendiente','confirmed':'Confirmado','preparing':'Preparando','in_transit':'En camino','delivered':'Entregado','cancelled':'Cancelado'}[o.status] }}</span></td>
+              <td><a href="{{ url_for('buyer_order_detail', oid=o.id) }}" class="btn btn-ghost btn-sm">Ver</a></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <div style="margin-top:12px;text-align:right">
+        <a href="{{ url_for('buyer_orders') }}" style="font-size:13px;color:var(--blue);font-weight:600">Ver todos los pedidos →</a>
+      </div>
+    {% else %}
+      <div class="empty">
+        <div class="empty-icon">📦</div>
+        <h3>Sin pedidos aún</h3>
+        <p>Explora el catálogo y realiza tu primer pedido.</p>
+        <a href="{{ url_for('buyer_catalogue') }}" class="btn btn-primary" style="margin-top:14px;width:auto">Ir al catálogo →</a>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Right col: notificaciones + productos destacados -->
+  <div style="display:flex;flex-direction:column;gap:20px">
+    <!-- IA alert card -->
+    <div style="background:linear-gradient(135deg,#EFF6FF,#F0FDF4);border:1px solid #BFDBFE;border-radius:var(--r-lg);padding:20px">
+      <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--blue);margin-bottom:10px">🤖 Sugerencia IA</div>
+      <p style="font-size:14px;color:var(--ink);font-weight:500;line-height:1.65;margin-bottom:12px">
+        Basado en negocios similares al tuyo, considera agregar <strong>Agua Mineral 500ml</strong> y <strong>Lay's Original</strong> a tu próximo pedido. Alta rotación esta semana.
+      </p>
+      <a href="{{ url_for('buyer_catalogue') }}" class="btn btn-primary btn-sm" style="width:auto">Explorar catálogo</a>
+    </div>
+
+    <!-- Notificaciones -->
+    <div class="card" style="padding:16px">
+      <div class="card-title">🔔 Notificaciones recientes</div>
+      {% if notifs %}
+        <div style="display:flex;flex-direction:column;gap:8px">
+          {% for n in notifs %}
+          <div style="display:flex;gap:10px;padding:10px;border-radius:8px;background:var(--surface);border:1px solid var(--border)">
+            <span style="font-size:16px;flex-shrink:0">
+              {% if n.type=='success' %}✅{% elif n.type=='warning' %}⚠️{% elif n.type=='error' %}❌{% else %}ℹ️{% endif %}
+            </span>
+            <div>
+              <div style="font-size:13px;font-weight:700;color:var(--ink)">{{ n.title }}</div>
+              <div style="font-size:12px;color:var(--muted);margin-top:2px">{{ n.body }}</div>
+              <div style="font-size:10px;color:var(--muted);margin-top:4px">{{ n.created_at[:16] }}</div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        <div style="margin-top:10px;text-align:right">
+          <a href="{{ url_for('notifications') }}" style="font-size:12px;color:var(--blue);font-weight:600">Ver todas →</a>
+        </div>
+      {% else %}
+        <p style="font-size:13px;color:var(--muted)">Sin notificaciones nuevas.</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Productos destacados -->
+<div style="margin-top:24px">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+    <h2 style="font-size:16px;font-weight:800">🛍️ Productos disponibles</h2>
+    <a href="{{ url_for('buyer_catalogue') }}" style="font-size:13px;color:var(--blue);font-weight:600">Ver todos →</a>
+  </div>
+  <div class="grid-auto">
+    {% for p in products %}
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px;transition:box-shadow .18s,transform .18s" onmouseover="this.style.boxShadow='0 8px 24px rgba(15,23,42,.10)';this.style.transform='translateY(-2px)'" onmouseout="this.style.boxShadow='';this.style.transform=''">
+      <div style="font-size:36px;margin-bottom:10px">{{ p.image_emoji }}</div>
+      <div style="font-size:14px;font-weight:700;margin-bottom:3px;color:var(--ink)">{{ p.name }}</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:8px">{{ p.seller_name }}</div>
+      <div style="font-size:18px;font-weight:900;color:var(--blue);margin-bottom:10px">Bs. {{ '%.2f'|format(p.price) }}<span style="font-size:11px;font-weight:500;color:var(--muted)"> /{{ p.unit }}</span></div>
+      <div style="font-size:11px;color:{% if p.stock < 20 %}var(--red){% elif p.stock < 50 %}var(--amber-d){% else %}var(--green){% endif %};margin-bottom:10px;font-weight:600">
+        {% if p.stock < 20 %}⚠️ Stock bajo{% elif p.stock < 50 %}⚡ Stock limitado{% else %}✅ Disponible{% endif %} ({{ p.stock }} uds)
+      </div>
+      <form method="POST" action="{{ url_for('buyer_cart') }}">
+        <input type="hidden" name="action" value="add">
+        <input type="hidden" name="product_id" value="{{ p.id }}">
+        <input type="hidden" name="qty" value="{{ p.min_order }}">
+        <button type="submit" class="btn btn-primary btn-sm" style="width:100%">🛒 Agregar (mín {{ p.min_order }})</button>
+      </form>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

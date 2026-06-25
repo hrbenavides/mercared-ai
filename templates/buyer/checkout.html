@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block topbar_title %}Confirmar Pedido{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div><h1>Confirmar pedido</h1><p>Un paso más para completar tu compra.</p></div>
+</div>
+<div class="grid-2" style="align-items:start">
+  <form method="POST" action="{{ url_for('buyer_checkout') }}">
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-title">📍 Datos de entrega</div>
+      <div class="form-group">
+        <label class="form-label">Dirección de entrega <span style="color:var(--red)">*</span></label>
+        <input type="text" name="address" class="form-control" placeholder="Ej: Av. Buenos Aires 123, La Paz" required value="{{ current_user.city }}">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Notas para el pedido</label>
+        <textarea name="notes" class="form-control" rows="3" placeholder="Instrucciones especiales, horario de entrega, etc."></textarea>
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary" style="width:100%;padding:14px;font-size:16px">✅ Realizar pedido — Bs. {{ '%.2f'|format(total) }}</button>
+  </form>
+
+  <div class="card">
+    <div class="card-title">Productos del pedido</div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      {% for item in items %}
+      <div style="display:flex;align-items:center;gap:12px;padding:10px;background:var(--surface);border-radius:8px;border:1px solid var(--border)">
+        <span style="font-size:24px">{{ item.image_emoji }}</span>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:700">{{ item.name }}</div>
+          <div style="font-size:12px;color:var(--muted)">{{ item.qty }} × Bs. {{ '%.2f'|format(item.price) }}</div>
+        </div>
+        <span style="font-size:14px;font-weight:800;color:var(--blue)">Bs. {{ '%.2f'|format(item.price * item.qty) }}</span>
+      </div>
+      {% endfor %}
+    </div>
+    <div style="border-top:1px solid var(--border);margin-top:14px;padding-top:14px;display:flex;justify-content:space-between">
+      <span style="font-weight:700">Total</span>
+      <span style="font-size:22px;font-weight:900;color:var(--blue)">Bs. {{ '%.2f'|format(total) }}</span>
+    </div>
+  </div>
+</div>
+{% endblock %}

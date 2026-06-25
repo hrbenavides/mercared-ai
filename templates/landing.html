@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>MercaRed AI — Ecosistema Digital de Abastecimiento</title>
+<style>
+:root{
+  --ink:#0F172A;--blue:#2563EB;--blue-d:#1D4ED8;--blue-l:#3B82F6;
+  --amber:#F59E0B;--green:#10B981;--muted:#64748B;--border:#E2E8F0;
+  --surface:#F8FAFC;--card:#fff;--purple:#7C3AED;
+  --font:'Segoe UI',system-ui,-apple-system,sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--surface);color:var(--ink);overflow-x:hidden}
+a{text-decoration:none;color:inherit}
+
+/* NAV */
+.nav{
+  position:fixed;top:0;left:0;right:0;z-index:1000;
+  background:rgba(248,250,252,.88);backdrop-filter:blur(16px) saturate(1.4);
+  border-bottom:1px solid rgba(226,232,240,.6);
+}
+.nav-inner{
+  max-width:1200px;margin:0 auto;padding:0 24px;
+  display:flex;align-items:center;justify-content:space-between;height:62px;
+}
+.logo{display:flex;align-items:center;gap:10px;font-size:19px;font-weight:800}
+.logo-icon{width:34px;height:34px;border-radius:8px;background:linear-gradient(135deg,var(--blue),var(--purple));display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;color:#fff}
+.logo span{color:var(--blue)}
+.logo small{font-size:9px;font-weight:700;color:var(--amber);margin-left:2px}
+.nav-links{display:flex;align-items:center;gap:4px}
+.nav-links a{font-size:14px;font-weight:500;color:var(--muted);padding:6px 12px;border-radius:8px;transition:all .15s}
+.nav-links a:hover{color:var(--ink);background:var(--border)}
+.nav-cta{background:var(--blue);color:#fff!important;padding:8px 16px!important;border-radius:8px!important;font-weight:600!important}
+.nav-cta:hover{background:var(--blue-d)!important}
+.hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:8px}
+.hamburger span{display:block;width:22px;height:2px;background:var(--ink);border-radius:2px}
+
+/* HERO */
+.hero{
+  min-height:100vh;display:flex;align-items:center;padding-top:62px;
+  background:linear-gradient(160deg,#0F172A 0%,#1E3A8A 55%,#0F172A 100%);
+  position:relative;overflow:hidden;
+}
+.hero::before{content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 60% 50% at 70% 50%,rgba(37,99,235,.25) 0%,transparent 65%),
+             radial-gradient(ellipse 40% 40% at 15% 80%,rgba(124,58,237,.15) 0%,transparent 60%)}
+.hero::after{content:'';position:absolute;inset:0;
+  background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);
+  background-size:40px 40px}
+.hero-inner{
+  max-width:1200px;margin:0 auto;padding:80px 24px;
+  position:relative;z-index:1;
+  display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;
+}
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);
+  color:rgba(255,255,255,.85);font-size:12px;font-weight:600;
+  letter-spacing:1px;text-transform:uppercase;
+  padding:6px 14px;border-radius:100px;margin-bottom:24px;
+}
+.pulse{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.hero-title{font-size:clamp(36px,5vw,62px);font-weight:900;line-height:1.07;color:#fff;margin-bottom:20px;letter-spacing:-1.5px}
+.grad{background:linear-gradient(90deg,#60A5FA,#A78BFA,var(--amber));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-sub{font-size:17px;color:rgba(255,255,255,.68);max-width:460px;line-height:1.75;margin-bottom:36px}
+.hero-btns{display:flex;gap:12px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:8px;font-size:15px;font-weight:600;padding:12px 22px;border-radius:10px;border:none;cursor:pointer;transition:all .18s;font-family:var(--font)}
+.btn-primary{background:var(--blue);color:#fff}
+.btn-primary:hover{background:var(--blue-d);transform:translateY(-2px);box-shadow:0 8px 24px rgba(37,99,235,.4)}
+.btn-ghost{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.2)}
+.btn-ghost:hover{background:rgba(255,255,255,.18)}
+
+/* HERO VISUAL */
+.hero-visual{position:relative}
+.hv-card{
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);
+  backdrop-filter:blur(20px);border-radius:18px;padding:18px;
+  box-shadow:0 32px 80px rgba(0,0,0,.4);
+  animation:float 6s ease-in-out infinite;
+}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.hv-dots{display:flex;gap:6px;margin-bottom:14px}
+.hv-dots span{width:10px;height:10px;border-radius:50%}
+.hv-dots span:nth-child(1){background:#EF4444}
+.hv-dots span:nth-child(2){background:#F59E0B}
+.hv-dots span:nth-child(3){background:#10B981}
+.hv-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.hv-kpi{background:rgba(255,255,255,.06);border-radius:8px;padding:10px;border:1px solid rgba(255,255,255,.08)}
+.hv-kpi-val{font-size:18px;font-weight:800;color:#fff}
+.hv-kpi-lab{font-size:10px;color:rgba(255,255,255,.45);margin-top:2px}
+.hv-kpi-trend{font-size:10px;color:var(--green);margin-top:3px;font-weight:600}
+.mini-chart{display:flex;align-items:flex-end;gap:4px;height:44px;margin-bottom:14px}
+.mini-bar{flex:1;border-radius:4px 4px 0 0;background:linear-gradient(180deg,var(--blue-l),var(--blue));animation:grow .8s ease-out forwards;transform-origin:bottom}
+@keyframes grow{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+.hv-alert{background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.3);border-radius:8px;padding:10px 12px;display:flex;gap:8px;align-items:flex-start}
+.hv-alert-text{font-size:11px;color:rgba(255,255,255,.8);line-height:1.5}
+.hv-pill{
+  position:absolute;bottom:-14px;left:-20px;
+  background:var(--card);border-radius:100px;padding:9px 16px;
+  display:flex;align-items:center;gap:8px;
+  box-shadow:0 20px 48px rgba(0,0,0,.3);font-size:13px;font-weight:600;color:var(--ink);
+  animation:slideIn .5s .3s both;
+}
+@keyframes slideIn{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:none}}
+.pill-dot{width:7px;height:7px;border-radius:50%;background:var(--green)}
+.hv-pill2{
+  position:absolute;top:-14px;right:-12px;
+  background:linear-gradient(135deg,var(--blue),var(--purple));
+  color:#fff;border-radius:12px;padding:10px 14px;
+  font-size:12px;font-weight:600;box-shadow:0 20px 48px rgba(0,0,0,.3);
+  animation:slideIn2 .5s .5s both;
+}
+@keyframes slideIn2{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
+.hv-pill2 strong{display:block;font-size:20px;font-weight:900}
+
+/* SECTIONS */
+section{padding:88px 0}
+.container{max-width:1200px;margin:0 auto;padding:0 24px}
+.sec-label{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--blue);margin-bottom:10px}
+.sec-title{font-size:clamp(26px,4vw,42px);font-weight:800;line-height:1.15;margin-bottom:14px}
+.sec-sub{font-size:16px;color:var(--muted);max-width:540px;line-height:1.75}
+.sec-head{margin-bottom:52px}
+
+/* HOW IT WORKS */
+.steps-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:28px}
+.step-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:28px;box-shadow:0 1px 3px rgba(15,23,42,.06);transition:box-shadow .2s,transform .2s;position:relative;overflow:hidden}
+.step-card:hover{box-shadow:0 8px 24px rgba(15,23,42,.10);transform:translateY(-3px)}
+.step-num{font-size:48px;font-weight:900;color:rgba(37,99,235,.08);position:absolute;top:12px;right:16px;line-height:1}
+.step-icon{font-size:32px;margin-bottom:14px}
+.step-title{font-size:16px;font-weight:800;margin-bottom:8px}
+.step-desc{font-size:14px;color:var(--muted);line-height:1.7}
+
+/* ROLES */
+.roles-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.role-card{border-radius:16px;padding:32px;border:1px solid var(--border);transition:transform .2s,box-shadow .2s;position:relative;overflow:hidden}
+.role-card:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(15,23,42,.10)}
+.role-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.role-buyer{background:#EFF6FF}.role-buyer::before{background:linear-gradient(90deg,var(--blue),var(--blue-l))}
+.role-seller{background:#F5F3FF}.role-seller::before{background:linear-gradient(90deg,var(--purple),#A78BFA)}
+.role-transporter{background:#FFFBEB}.role-transporter::before{background:linear-gradient(90deg,var(--amber),#FCD34D)}
+.role-icon{font-size:36px;margin-bottom:14px}
+.role-title{font-size:17px;font-weight:800;margin-bottom:6px}
+.role-desc{font-size:13px;color:var(--muted);margin-bottom:18px}
+.role-list{list-style:none;display:flex;flex-direction:column;gap:7px}
+.role-list li{font-size:13px;font-weight:500;display:flex;align-items:center;gap:7px}
+.role-list li::before{content:'✓';color:var(--green);font-weight:800;flex-shrink:0}
+
+/* CTA */
+.cta-section{background:linear-gradient(135deg,var(--blue) 0%,var(--purple) 100%);padding:80px 0;text-align:center}
+.cta-title{font-size:clamp(26px,4vw,44px);font-weight:900;color:#fff;margin-bottom:14px}
+.cta-sub{font-size:17px;color:rgba(255,255,255,.75);max-width:520px;margin:0 auto 36px;line-height:1.7}
+.cta-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.btn-white{background:#fff;color:var(--blue)}
+.btn-white:hover{background:rgba(255,255,255,.92);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.2)}
+.btn-outline{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.3)}
+.btn-outline:hover{background:rgba(255,255,255,.2)}
+
+/* FOOTER */
+footer{background:var(--ink);padding:40px 0 20px;border-top:1px solid rgba(255,255,255,.06)}
+.footer-inner{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:36px;margin-bottom:32px}
+.footer-brand p{font-size:13px;color:rgba(255,255,255,.4);line-height:1.7;max-width:220px;margin-top:10px}
+.footer-col h4{font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:12px}
+.footer-col a{display:block;font-size:13px;color:rgba(255,255,255,.4);margin-bottom:7px;transition:color .15s}
+.footer-col a:hover{color:rgba(255,255,255,.8)}
+.footer-bottom{border-top:1px solid rgba(255,255,255,.06);padding-top:18px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.footer-copy{font-size:12px;color:rgba(255,255,255,.3)}
+.footer-badges{display:flex;gap:8px}
+.fb{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.4);font-size:10px;font-weight:600;padding:3px 9px;border-radius:6px}
+
+/* REVEAL */
+.reveal{opacity:0;transform:translateY(20px);transition:opacity .6s,transform .6s}
+.reveal.visible{opacity:1;transform:none}
+.d1{transition-delay:.1s}.d2{transition-delay:.2s}.d3{transition-delay:.3s}
+
+/* MOBILE */
+.mobile-menu{display:none;position:fixed;top:62px;left:0;right:0;z-index:999;background:rgba(248,250,252,.97);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:12px 20px;flex-direction:column}
+.mobile-menu.open{display:flex}
+.mobile-menu a{font-size:15px;font-weight:500;color:var(--muted);padding:11px 0;border-bottom:1px solid var(--border)}
+@media(max-width:960px){
+  .hero-inner{grid-template-columns:1fr;gap:40px;text-align:center}
+  .hero-sub{margin:0 auto 36px}
+  .hero-btns{justify-content:center}
+  .hero-visual{display:none}
+  .steps-grid,.roles-grid{grid-template-columns:1fr}
+  .footer-inner{grid-template-columns:1fr 1fr}
+  .nav-links{display:none}
+  .hamburger{display:flex}
+}
+@media(max-width:640px){.footer-inner{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="logo">
+      <div class="logo-icon">M</div>
+      Merca<span>Red</span><small>AI</small>
+    </div>
+    <div class="nav-links">
+      <a href="#como-funciona">Cómo funciona</a>
+      <a href="#para-quien">Para quién</a>
+      <a href="{{ url_for('login') }}">Iniciar sesión</a>
+      <a href="{{ url_for('register') }}" class="nav-cta">Registrarse gratis →</a>
+    </div>
+    <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#como-funciona">Cómo funciona</a>
+  <a href="#para-quien">Para quién</a>
+  <a href="{{ url_for('login') }}">Iniciar sesión</a>
+  <a href="{{ url_for('register') }}">Registrarse gratis →</a>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div>
+      <div class="hero-eyebrow"><span class="pulse"></span> Plataforma B2B · Bolivia</div>
+      <h1 class="hero-title">
+        El ecosistema que<br>
+        <span class="grad">conecta el comercio</span><br>
+        del mañana
+      </h1>
+      <p class="hero-sub">
+        MercaRed AI centraliza el abastecimiento de pequeños comercios con fabricantes, distribuidores y transportistas en un único ecosistema digital.
+      </p>
+      <div class="hero-btns">
+        <a href="{{ url_for('register') }}" class="btn btn-primary">▶ Empezar gratis</a>
+        <a href="{{ url_for('login') }}" class="btn btn-ghost">Iniciar sesión →</a>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="hv-card">
+        <div class="hv-dots"><span></span><span></span><span></span></div>
+        <div class="hv-kpis">
+          <div class="hv-kpi"><div class="hv-kpi-val">Bs.84K</div><div class="hv-kpi-lab">Pedidos activos</div><div class="hv-kpi-trend">↑ 12.4%</div></div>
+          <div class="hv-kpi"><div class="hv-kpi-val">247</div><div class="hv-kpi-lab">Órdenes hoy</div><div class="hv-kpi-trend">↑ 8.1%</div></div>
+          <div class="hv-kpi"><div class="hv-kpi-val">98%</div><div class="hv-kpi-lab">Entrega a tiempo</div><div class="hv-kpi-trend">↑ 2.3%</div></div>
+        </div>
+        <div class="mini-chart" id="miniChart"></div>
+        <div class="hv-alert">
+          <span>🤖</span>
+          <div class="hv-alert-text"><strong style="color:#fff">IA:</strong> Coca-Cola tendrá demanda +18% la próxima semana. Se recomienda aumentar stock.</div>
+        </div>
+      </div>
+      <div class="hv-pill"><div class="pill-dot"></div> Nuevo pedido · Tienda San Martín</div>
+      <div class="hv-pill2"><strong>+18%</strong>Demanda proyectada</div>
+    </div>
+  </div>
+</section>
+
+<!-- CÓMO FUNCIONA -->
+<section id="como-funciona">
+  <div class="container">
+    <div class="sec-head reveal">
+      <div class="sec-label">Cómo funciona</div>
+      <h2 class="sec-title">Simple para todos,<br>poderoso por dentro</h2>
+      <p class="sec-sub">Tres pasos para transformar cómo abasteces tu negocio.</p>
+    </div>
+    <div class="steps-grid">
+      <div class="step-card reveal"><div class="step-num">1</div><div class="step-icon">📝</div><h3 class="step-title">Regístrate en minutos</h3><p class="step-desc">Crea tu cuenta como comprador, distribuidor o transportista. Sin costos de membresía ni contratos mínimos.</p></div>
+      <div class="step-card reveal d1"><div class="step-num">2</div><div class="step-icon">🛍️</div><h3 class="step-title">Explora el catálogo</h3><p class="step-desc">Accede a miles de productos de distribuidores verificados. Filtra por categoría, precio y disponibilidad en tiempo real.</p></div>
+      <div class="step-card reveal d2"><div class="step-num">3</div><div class="step-icon">🚀</div><h3 class="step-title">Pedido y entrega</h3><p class="step-desc">Confirma tu pedido en un clic. Nuestros transportistas asignados llevan todo directamente a tu negocio.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- PARA QUIÉN -->
+<section id="para-quien" style="background:var(--card)">
+  <div class="container">
+    <div class="sec-head reveal">
+      <div class="sec-label">Para quién</div>
+      <h2 class="sec-title">Una plataforma,<br>múltiples actores</h2>
+      <p class="sec-sub">Cada usuario tiene su propio espacio diseñado para sus necesidades específicas.</p>
+    </div>
+    <div class="roles-grid">
+      <div class="role-card role-buyer reveal">
+        <div class="role-icon">🏪</div>
+        <h3 class="role-title">Compradores</h3>
+        <p class="role-desc">Tiendas, cafeterías, restaurantes, farmacias y cualquier comercio minorista.</p>
+        <ul class="role-list">
+          <li>Catálogo unificado de proveedores</li>
+          <li>Carrito de compras en tiempo real</li>
+          <li>Seguimiento de pedidos</li>
+          <li>Historial y analítica propia</li>
+        </ul>
+      </div>
+      <div class="role-card role-seller reveal d1">
+        <div class="role-icon">🏭</div>
+        <h3 class="role-title">Distribuidores</h3>
+        <p class="role-desc">Fabricantes, mayoristas e importadores que buscan ampliar su red de clientes.</p>
+        <ul class="role-list">
+          <li>Gestión de catálogo de productos</li>
+          <li>Recepción y gestión de pedidos</li>
+          <li>Dashboard de ingresos</li>
+          <li>Notificaciones en tiempo real</li>
+        </ul>
+      </div>
+      <div class="role-card role-transporter reveal d2">
+        <div class="role-icon">🚚</div>
+        <h3 class="role-title">Transportistas</h3>
+        <p class="role-desc">Empresas o conductores independientes que quieren más entregas optimizadas.</p>
+        <ul class="role-list">
+          <li>Tablero de entregas disponibles</li>
+          <li>Asignación con un clic</li>
+          <li>Confirmación de entrega digital</li>
+          <li>Historial de rutas completadas</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="container">
+    <h2 class="cta-title reveal">¿Listo para transformar<br>tu negocio?</h2>
+    <p class="cta-sub reveal">Únete al ecosistema digital que conecta comercios con distribuidores en Bolivia.</p>
+    <div class="cta-btns reveal">
+      <a href="{{ url_for('register') }}" class="btn btn-white">▶ Crear cuenta gratis</a>
+      <a href="{{ url_for('login') }}" class="btn btn-outline">Ya tengo cuenta →</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <div class="logo" style="color:#fff"><div class="logo-icon">M</div>Merca<span style="color:#60A5FA">Red</span><small>AI</small></div>
+        <p>Sistema inteligente de abastecimiento B2B para pequeños comercios, distribuidores y transportistas en Bolivia.</p>
+      </div>
+      <div class="footer-col"><h4>Plataforma</h4><a href="#">Para compradores</a><a href="#">Para distribuidores</a><a href="#">Para transportistas</a></div>
+      <div class="footer-col"><h4>Empresa</h4><a href="#">Nosotros</a><a href="#">Blog</a><a href="#">Inversores</a></div>
+      <div class="footer-col"><h4>Legal</h4><a href="#">Privacidad</a><a href="#">Términos</a><a href="#">Seguridad</a></div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-copy">© 2025 MercaRed AI · Proyecto UMSA — Ingeniería Electrónica</div>
+      <div class="footer-badges"><div class="fb">🔒 SSL</div><div class="fb">☁️ Cloud</div><div class="fb">🤖 AI</div></div>
+    </div>
+  </div>
+</footer>
+
+<script>
+// Hamburger
+const hb = document.getElementById('hamburger');
+const mm = document.getElementById('mobileMenu');
+hb?.addEventListener('click', () => mm.classList.toggle('open'));
+mm?.querySelectorAll('a').forEach(a => a.addEventListener('click', () => mm.classList.remove('open')));
+
+// Mini chart
+const mc = document.getElementById('miniChart');
+[30,45,38,60,52,80,70,90,75,95].forEach((h,i) => {
+  const b = document.createElement('div');
+  b.className = 'mini-bar';
+  b.style.cssText = `height:${h}%;animation-delay:${i*.06}s`;
+  mc.appendChild(b);
+});
+
+// Reveal
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible') });
+}, {threshold:.12});
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+</script>
+</body>
+</html>

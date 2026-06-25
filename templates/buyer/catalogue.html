@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block topbar_title %}Catálogo de Productos{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div><h1>Catálogo</h1><p>Todos los distribuidores, un solo lugar.</p></div>
+  <a href="{{ url_for('buyer_cart') }}" class="btn btn-primary">🛒 Carrito ({{ cart_count }})</a>
+</div>
+
+<!-- Filters -->
+<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px">
+  <form method="GET" action="{{ url_for('buyer_catalogue') }}" style="display:flex;gap:8px;flex-wrap:wrap;flex:1">
+    <input type="text" name="q" value="{{ search }}" class="form-control" placeholder="🔍 Buscar productos..." style="max-width:260px">
+    <select name="category" class="form-control" style="max-width:180px" onchange="this.form.submit()">
+      <option value="">Todas las categorías</option>
+      {% for c in categories %}
+        <option value="{{ c.category }}" {% if active_cat==c.category %}selected{% endif %}>{{ c.category }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit" class="btn btn-ghost">Buscar</button>
+    {% if search or active_cat %}
+      <a href="{{ url_for('buyer_catalogue') }}" class="btn btn-ghost">✕ Limpiar</a>
+    {% endif %}
+  </form>
+</div>
+
+{% if products %}
+<div class="grid-auto">
+  {% for p in products %}
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);padding:18px;display:flex;flex-direction:column;gap:8px;transition:box-shadow .18s,transform .18s" onmouseover="this.style.boxShadow='0 8px 24px rgba(15,23,42,.10)';this.style.transform='translateY(-2px)'" onmouseout="this.style.boxShadow='';this.style.transform=''">
+    <div style="font-size:40px">{{ p.image_emoji }}</div>
+    <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--blue);background:rgba(37,99,235,.08);padding:2px 8px;border-radius:100px;display:inline-block;width:fit-content">{{ p.category }}</span>
+    <div style="font-size:15px;font-weight:800;color:var(--ink)">{{ p.name }}</div>
+    {% if p.description %}<div style="font-size:12px;color:var(--muted)">{{ p.description }}</div>{% endif %}
+    <div style="font-size:11px;color:var(--muted)">📦 {{ p.seller_name }}</div>
+    <div style="font-size:22px;font-weight:900;color:var(--blue)">Bs. {{ '%.2f'|format(p.price) }}<span style="font-size:12px;font-weight:500;color:var(--muted)"> /{{ p.unit }}</span></div>
+    <div style="font-size:11px;font-weight:600;color:{% if p.stock<20 %}var(--red){% elif p.stock<50 %}var(--amber-d){% else %}var(--green){% endif %}">
+      {% if p.stock<20 %}⚠️ Quedan {{ p.stock }} unidades{% elif p.stock<50 %}⚡ Stock limitado ({{ p.stock }}){% else %}✅ {{ p.stock }} disponibles{% endif %}
+    </div>
+    <div style="font-size:11px;color:var(--muted)">Pedido mínimo: {{ p.min_order }} {{ p.unit }}(s)</div>
+    <form method="POST" action="{{ url_for('buyer_cart') }}" style="display:flex;gap:6px;margin-top:auto">
+      <input type="hidden" name="action" value="add">
+      <input type="hidden" name="product_id" value="{{ p.id }}">
+      <input type="number" name="qty" value="{{ p.min_order }}" min="{{ p.min_order }}" max="{{ p.stock }}" class="form-control" style="width:70px;padding:8px 10px">
+      <button type="submit" class="btn btn-primary btn-sm" style="flex:1">🛒 Añadir</button>
+    </form>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty">
+  <div class="empty-icon">🔍</div>
+  <h3>Sin resultados</h3>
+  <p>No encontramos productos para tu búsqueda.</p>
+  <a href="{{ url_for('buyer_catalogue') }}" class="btn btn-ghost" style="margin-top:14px;width:auto">Ver todo el catálogo</a>
+</div>
+{% endif %}
+{% endblock %}

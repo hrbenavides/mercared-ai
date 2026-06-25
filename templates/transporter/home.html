@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block topbar_title %}Panel Transportista{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div><h1>🚚 Panel de Entregas</h1><p>{{ current_user.company or current_user.full_name }}</p></div>
+</div>
+
+<div class="grid-4" style="margin-bottom:24px">
+  <div class="kpi blue"><div class="kpi-icon">📋</div><div class="kpi-val">{{ deliveries|length }}</div><div class="kpi-label">Disponibles ahora</div></div>
+  <div class="kpi green"><div class="kpi-icon">✅</div><div class="kpi-val">{{ completed }}</div><div class="kpi-label">Completadas por ti</div></div>
+  <div class="kpi amber"><div class="kpi-icon">🏙️</div><div class="kpi-val">{{ current_user.city }}</div><div class="kpi-label" style="font-size:11px">Tu zona</div></div>
+  <div class="kpi purple"><div class="kpi-icon">⭐</div><div class="kpi-val">4.8</div><div class="kpi-label">Calificación</div></div>
+</div>
+
+{% if deliveries %}
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>#</th><th>Comprador</th><th>Proveedor</th><th>Dirección</th><th>Total</th><th>Estado</th><th>Acción</th></tr></thead>
+    <tbody>
+      {% for o in deliveries %}
+      <tr>
+        <td style="font-weight:800;color:var(--muted)">#{{ '%04d'|format(o.id) }}</td>
+        <td>
+          <div style="font-weight:700;font-size:13px">{{ o.buyer_company or o.buyer_name }}</div>
+          <div style="font-size:11px;color:var(--muted)">{{ o.created_at[:10] }}</div>
+        </td>
+        <td style="font-size:13px;font-weight:600">{{ o.seller_company or o.seller_name }}</td>
+        <td style="font-size:12px;color:var(--muted);max-width:150px">{{ o.delivery_address or '—' }}</td>
+        <td style="font-weight:800">Bs. {{ '%.2f'|format(o.total) }}</td>
+        <td><span class="status s-{{ o.status }}">{{ {'pending':'Pendiente','confirmed':'Confirmado','preparing':'Preparando','in_transit':'En camino'}[o.status] }}</span></td>
+        <td>
+          <div style="display:flex;gap:6px">
+            {% if o.transporter_id != current_user.id and o.status != 'in_transit' %}
+            <form method="POST" action="{{ url_for('transporter_assign', oid=o.id) }}">
+              <button type="submit" class="btn btn-primary btn-sm">📍 Asignarme</button>
+            </form>
+            {% elif o.transporter_id == current_user.id %}
+            <form method="POST" action="{{ url_for('transporter_deliver', oid=o.id) }}" onsubmit="return confirm('¿Confirmar entrega completada?')">
+              <button type="submit" class="btn btn-success btn-sm">✅ Entregado</button>
+            </form>
+            {% else %}
+            <span style="font-size:12px;color:var(--muted)">Asignado a otro</span>
+            {% endif %}
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="empty">
+  <div class="empty-icon">🚚</div>
+  <h3>Sin entregas disponibles</h3>
+  <p>No hay pedidos en tránsito en este momento. Vuelve a verificar pronto.</p>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block topbar_title %}Mis Productos{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div><h1>📋 Mis Productos</h1><p>Gestiona tu catálogo de productos.</p></div>
+</div>
+
+<!-- Add product form -->
+<div class="card" style="margin-bottom:24px">
+  <div class="card-title">➕ Agregar nuevo producto</div>
+  <form method="POST" action="{{ url_for('seller_products') }}">
+    <input type="hidden" name="action" value="add">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px">
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">Nombre <span style="color:var(--red)">*</span></label>
+        <input type="text" name="name" class="form-control" placeholder="Nombre del producto" required>
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">Categoría</label>
+        <select name="category" class="form-control">
+          <option>Bebidas</option><option>Snacks</option><option>Limpieza</option>
+          <option>Dulces</option><option>Abarrotes</option><option>Lácteos</option><option>General</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">Precio (Bs.) <span style="color:var(--red)">*</span></label>
+        <input type="number" name="price" class="form-control" placeholder="0.00" step="0.01" min="0.01" required>
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">Unidad</label>
+        <select name="unit" class="form-control">
+          <option>unidad</option><option>paquete</option><option>bolsa</option>
+          <option>caja</option><option>kg</option><option>litro</option><option>pack</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">Stock</label>
+        <input type="number" name="stock" class="form-control" placeholder="0" min="0" value="0">
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">Pedido mínimo</label>
+        <input type="number" name="min_order" class="form-control" placeholder="1" min="1" value="1">
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">Emoji</label>
+        <select name="image_emoji" class="form-control">
+          <option>📦</option><option>🥤</option><option>🍫</option><option>🍟</option>
+          <option>💧</option><option>🧻</option><option>🧴</option><option>🍬</option>
+          <option>☕</option><option>🍚</option><option>🫙</option><option>🥛</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin-bottom:0;grid-column:span 2">
+        <label class="form-label">Descripción</label>
+        <input type="text" name="description" class="form-control" placeholder="Descripción breve del producto">
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary" style="margin-top:14px">➕ Agregar producto</button>
+  </form>
+</div>
+
+<!-- Products table -->
+{% if products %}
+<div class="table-wrap">
+  <table>
+    <thead><tr><th></th><th>Producto</th><th>Categoría</th><th>Precio</th><th>Stock</th><th>Pedido mín.</th><th>Acciones</th></tr></thead>
+    <tbody>
+      {% for p in products %}
+      <tr>
+        <td style="font-size:24px">{{ p.image_emoji }}</td>
+        <td>
+          <div style="font-weight:700;font-size:14px">{{ p.name }}</div>
+          {% if p.description %}<div style="font-size:11px;color:var(--muted)">{{ p.description }}</div>{% endif %}
+        </td>
+        <td><span style="font-size:11px;font-weight:700;background:rgba(37,99,235,.08);color:var(--blue);padding:3px 9px;border-radius:100px">{{ p.category }}</span></td>
+        <td style="font-weight:800;color:var(--blue)">Bs. {{ '%.2f'|format(p.price) }}</td>
+        <td>
+          <form method="POST" action="{{ url_for('seller_products') }}" style="display:flex;gap:6px;align-items:center">
+            <input type="hidden" name="action" value="update_stock">
+            <input type="hidden" name="product_id" value="{{ p.id }}">
+            <input type="number" name="stock" value="{{ p.stock }}" min="0" class="form-control" style="width:70px;padding:6px 10px">
+            <button type="submit" class="btn btn-ghost btn-sm">✓</button>
+          </form>
+        </td>
+        <td style="color:var(--muted)">{{ p.min_order }} {{ p.unit }}(s)</td>
+        <td>
+          <form method="POST" action="{{ url_for('seller_products') }}" onsubmit="return confirm('¿Eliminar este producto?')">
+            <input type="hidden" name="action" value="delete">
+            <input type="hidden" name="product_id" value="{{ p.id }}">
+            <button type="submit" class="btn btn-danger btn-sm">🗑️</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="empty"><div class="empty-icon">📋</div><h3>Sin productos todavía</h3><p>Agrega tu primer producto con el formulario de arriba.</p></div>
+{% endif %}
+{% endblock %}

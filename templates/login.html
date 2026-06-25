@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block public_content %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Iniciar sesión — MercaRed AI</title>
+<style>
+:root{--ink:#0F172A;--blue:#2563EB;--blue-d:#1D4ED8;--green:#10B981;--red:#EF4444;--muted:#64748B;--border:#E2E8F0;--surface:#F8FAFC;--card:#fff;--purple:#7C3AED;--font:'Segoe UI',system-ui,sans-serif}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:linear-gradient(135deg,#0F172A 0%,#1E3A8A 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;position:relative;overflow:hidden}
+body::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);background-size:40px 40px}
+.auth-wrap{display:grid;grid-template-columns:1fr 1fr;max-width:900px;width:100%;border-radius:20px;overflow:hidden;box-shadow:0 40px 100px rgba(0,0,0,.5);position:relative;z-index:1}
+.auth-left{background:linear-gradient(160deg,rgba(37,99,235,.4),rgba(124,58,237,.4));backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.12);padding:48px 40px;display:flex;flex-direction:column;justify-content:space-between}
+.auth-right{background:var(--card);padding:48px 40px}
+.logo{display:flex;align-items:center;gap:10px;font-size:18px;font-weight:800;color:#fff;margin-bottom:48px}
+.logo-icon{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--blue),var(--purple));display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:#fff}
+.logo span{color:#60A5FA}
+.logo small{font-size:9px;font-weight:700;color:#F59E0B;margin-left:2px}
+.auth-left h2{font-size:28px;font-weight:900;color:#fff;line-height:1.2;margin-bottom:14px}
+.auth-left p{font-size:15px;color:rgba(255,255,255,.65);line-height:1.75;margin-bottom:32px}
+.feat-list{display:flex;flex-direction:column;gap:12px}
+.feat-item{display:flex;align-items:center;gap:12px;font-size:13px;color:rgba(255,255,255,.8)}
+.feat-icon{width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.demo-accounts{margin-top:auto;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:14px 16px}
+.demo-title{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:10px}
+.demo-item{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.08)}
+.demo-item:last-child{border-bottom:none}
+.demo-role{font-size:12px;font-weight:600;color:rgba(255,255,255,.8)}
+.demo-creds{font-size:11px;color:rgba(255,255,255,.45);font-family:monospace}
+
+/* Form */
+.form-title{font-size:24px;font-weight:800;color:var(--ink);margin-bottom:6px}
+.form-sub{font-size:14px;color:var(--muted);margin-bottom:28px}
+.form-group{margin-bottom:16px}
+.form-label{display:block;font-size:13px;font-weight:600;color:var(--ink);margin-bottom:6px}
+.form-control{width:100%;padding:11px 14px;border:1px solid var(--border);border-radius:10px;font-size:14px;color:var(--ink);background:var(--surface);outline:none;transition:border-color .15s,box-shadow .15s;font-family:var(--font)}
+.form-control:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(37,99,235,.1);background:#fff}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:12px;border-radius:10px;border:none;font-size:15px;font-weight:700;cursor:pointer;transition:all .15s;font-family:var(--font)}
+.btn-primary{background:var(--blue);color:#fff}
+.btn-primary:hover{background:var(--blue-d);transform:translateY(-1px);box-shadow:0 6px 18px rgba(37,99,235,.35)}
+.divider{display:flex;align-items:center;gap:12px;margin:20px 0;color:var(--muted);font-size:12px}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
+.link{color:var(--blue);font-weight:600;font-size:14px;text-decoration:none}
+.link:hover{text-decoration:underline}
+.checkbox-row{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);margin-bottom:20px}
+.checkbox-row input{width:15px;height:15px;accent-color:var(--blue)}
+.flash{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:8px;font-size:13px;font-weight:500;margin-bottom:16px;border:1px solid}
+.flash.error{background:#FEF2F2;color:#7F1D1D;border-color:#FECACA}
+.flash.success{background:#F0FDF4;color:#065F46;border-color:#A7F3D0}
+.flash.info{background:#EFF6FF;color:#1E3A8A;border-color:#BFDBFE}
+.back-link{position:fixed;top:20px;left:20px;z-index:10;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;padding:8px 14px;border-radius:8px;font-size:13px;font-weight:600;backdrop-filter:blur(8px);transition:background .15s}
+.back-link:hover{background:rgba(255,255,255,.2)}
+@media(max-width:700px){
+  .auth-wrap{grid-template-columns:1fr}
+  .auth-left{display:none}
+}
+</style>
+</head>
+<body>
+<a href="{{ url_for('index') }}" class="back-link">← Inicio</a>
+<div class="auth-wrap">
+  <div class="auth-left">
+    <div>
+      <div class="logo"><div class="logo-icon">M</div>Merca<span>Red</span><small>AI</small></div>
+      <h2>El ecosistema digital que conecta tu negocio</h2>
+      <p>Accede al catálogo unificado de proveedores, gestiona tus pedidos y recibe notificaciones en tiempo real.</p>
+      <div class="feat-list">
+        <div class="feat-item"><div class="feat-icon">🛍️</div>Catálogo unificado de distribuidores</div>
+        <div class="feat-item"><div class="feat-icon">🤖</div>Inteligencia artificial predictiva</div>
+        <div class="feat-item"><div class="feat-icon">📦</div>Seguimiento de pedidos en tiempo real</div>
+        <div class="feat-item"><div class="feat-icon">🚚</div>Logística coordinada y optimizada</div>
+      </div>
+    </div>
+    <div class="demo-accounts">
+      <div class="demo-title">🔑 Cuentas de prueba</div>
+      <div class="demo-item"><span class="demo-role">🏪 Comprador</span><span class="demo-creds">comprador@demo.bo / demo123</span></div>
+      <div class="demo-item"><span class="demo-role">🏭 Vendedor</span><span class="demo-creds">vendedor@demo.bo / demo123</span></div>
+      <div class="demo-item"><span class="demo-role">🚚 Transporte</span><span class="demo-creds">transporte@demo.bo / demo123</span></div>
+    </div>
+  </div>
+
+  <div class="auth-right">
+    <div class="form-title">Bienvenido de nuevo</div>
+    <div class="form-sub">Ingresa con tu cuenta de MercaRed AI</div>
+
+    {% with msgs = get_flashed_messages(with_categories=true) %}
+      {% for cat, msg in msgs %}
+        <div class="flash {{ cat }}">{% if cat=='error' %}❌{% elif cat=='success' %}✅{% else %}ℹ️{% endif %} {{ msg }}</div>
+      {% endfor %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('login') }}">
+      <div class="form-group">
+        <label class="form-label">Correo electrónico</label>
+        <input type="email" name="email" class="form-control" placeholder="tu@correo.com" required autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Contraseña</label>
+        <input type="password" name="password" class="form-control" placeholder="••••••••" required autocomplete="current-password">
+      </div>
+      <div class="checkbox-row">
+        <input type="checkbox" name="remember" id="remember">
+        <label for="remember">Mantener sesión iniciada</label>
+      </div>
+      <button type="submit" class="btn btn-primary">Iniciar sesión →</button>
+    </form>
+
+    <div class="divider">o</div>
+    <p style="text-align:center;font-size:14px;color:var(--muted)">
+      ¿No tienes cuenta? <a href="{{ url_for('register') }}" class="link">Regístrate gratis</a>
+    </p>
+  </div>
+</div>
+</body>
+</html>
+{% endblock %}

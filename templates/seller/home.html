@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block topbar_title %}Dashboard Distribuidor{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div><h1>Dashboard 🏭</h1><p>{{ current_user.company or current_user.full_name }} · {{ current_user.city }}</p></div>
+  <a href="{{ url_for('seller_products') }}" class="btn btn-primary">+ Gestionar productos</a>
+</div>
+
+<div class="grid-4" style="margin-bottom:24px">
+  <div class="kpi blue"><div class="kpi-icon">📋</div><div class="kpi-val">{{ stats.total_products }}</div><div class="kpi-label">Productos activos</div></div>
+  <div class="kpi amber"><div class="kpi-icon">⏳</div><div class="kpi-val">{{ stats.pending_orders }}</div><div class="kpi-label">Pedidos pendientes</div></div>
+  <div class="kpi purple"><div class="kpi-icon">📦</div><div class="kpi-val">{{ stats.total_orders }}</div><div class="kpi-label">Pedidos totales</div></div>
+  <div class="kpi green"><div class="kpi-icon">💰</div><div class="kpi-val">Bs.<span style="font-size:18px"> {{ '%.0f'|format(stats.total_revenue) }}</span></div><div class="kpi-label">Ingresos (entregados)</div></div>
+</div>
+
+<div class="grid-2">
+  <!-- Pedidos recientes -->
+  <div class="card">
+    <div class="card-title">📦 Pedidos recientes</div>
+    {% if orders %}
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>#</th><th>Comprador</th><th>Total</th><th>Estado</th><th>Acción</th></tr></thead>
+        <tbody>
+          {% for o in orders %}
+          <tr>
+            <td style="font-weight:700;color:var(--muted)">#{{ '%04d'|format(o.id) }}</td>
+            <td>
+              <div style="font-weight:600;font-size:13px">{{ o.buyer_company or o.buyer_name }}</div>
+              <div style="font-size:11px;color:var(--muted)">{{ o.created_at[:10] }}</div>
+            </td>
+            <td style="font-weight:800">Bs. {{ '%.2f'|format(o.total) }}</td>
+            <td><span class="status s-{{ o.status }}">{{ {'pending':'Pendiente','confirmed':'Confirmado','preparing':'Preparando','in_transit':'En camino','delivered':'Entregado','cancelled':'Cancelado'}[o.status] }}</span></td>
+            <td>
+              {% if o.status == 'pending' %}
+              <form method="POST" action="{{ url_for('seller_order_update', oid=o.id) }}">
+                <input type="hidden" name="status" value="confirmed">
+                <button type="submit" class="btn btn-success btn-sm">✓ Confirmar</button>
+              </form>
+              {% else %}
+              <a href="{{ url_for('seller_orders') }}" class="btn btn-ghost btn-sm">Ver</a>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div style="margin-top:10px;text-align:right">
+      <a href="{{ url_for('seller_orders') }}" style="font-size:13px;color:var(--blue);font-weight:600">Ver todos →</a>
+    </div>
+    {% else %}
+    <div class="empty"><div class="empty-icon">📦</div><h3>Sin pedidos aún</h3><p>Cuando los compradores realicen pedidos de tus productos, aparecerán aquí.</p></div>
+    {% endif %}
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:20px">
+    <!-- Notificaciones -->
+    <div class="card">
+      <div class="card-title">🔔 Notificaciones</div>
+      {% if notifs %}
+        <div style="display:flex;flex-direction:column;gap:8px">
+          {% for n in notifs %}
+          <div style="display:flex;gap:10px;padding:10px;border-radius:8px;background:var(--surface);border:1px solid var(--border)">
+            <span style="font-size:16px;flex-shrink:0">{% if n.type=='success' %}✅{% elif n.type=='warning' %}⚠️{% else %}ℹ️{% endif %}</span>
+            <div>
+              <div style="font-size:13px;font-weight:700">{{ n.title }}</div>
+              <div style="font-size:12px;color:var(--muted);margin-top:2px">{{ n.body }}</div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p style="font-size:13px;color:var(--muted)">Sin notificaciones.</p>
+      {% endif %}
+    </div>
+
+    <!-- Stock alerts -->
+    <div class="card">
+      <div class="card-title">⚠️ Alertas de stock</div>
+      {% set low_stock = products | selectattr('stock', 'lt', 30) | list %}
+      {% if low_stock %}
+        {% for p in low_stock[:5] %}
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border)">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:20px">{{ p.image_emoji }}</span>
+            <span style="font-size:13px;font-weight:600">{{ p.name }}</span>
+          </div>
+          <span style="font-size:12px;font-weight:700;color:{% if p.stock < 10 %}var(--red){% else %}var(--amber-d){% endif %}">{{ p.stock }} uds</span>
+        </div>
+        {% endfor %}
+        <a href="{{ url_for('seller_products') }}" style="font-size:12px;color:var(--blue);font-weight:600;display:block;margin-top:10px">Actualizar stock →</a>
+      {% else %}
+        <p style="font-size:13px;color:var(--green)">✅ Todo el stock está en buen nivel.</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+{% block public_content %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Crear cuenta — MercaRed AI</title>
+<style>
+:root{--ink:#0F172A;--blue:#2563EB;--blue-d:#1D4ED8;--green:#10B981;--red:#EF4444;--amber:#F59E0B;--muted:#64748B;--border:#E2E8F0;--surface:#F8FAFC;--card:#fff;--purple:#7C3AED;--font:'Segoe UI',system-ui,sans-serif}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:linear-gradient(135deg,#0F172A 0%,#1E3A8A 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;position:relative;overflow-x:hidden}
+body::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);background-size:40px 40px}
+.wrap{max-width:960px;width:100%;display:grid;grid-template-columns:340px 1fr;border-radius:20px;overflow:hidden;box-shadow:0 40px 100px rgba(0,0,0,.5);position:relative;z-index:1}
+.left{background:linear-gradient(160deg,rgba(37,99,235,.4),rgba(124,58,237,.4));backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.12);padding:40px 32px;display:flex;flex-direction:column}
+.right{background:var(--card);padding:40px 36px;overflow-y:auto;max-height:90vh}
+.logo{display:flex;align-items:center;gap:10px;font-size:18px;font-weight:800;color:#fff;margin-bottom:36px}
+.logo-icon{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--blue),var(--purple));display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:#fff}
+.logo span{color:#60A5FA}
+.logo small{font-size:9px;font-weight:700;color:var(--amber);margin-left:2px}
+.left h2{font-size:22px;font-weight:900;color:#fff;line-height:1.25;margin-bottom:10px}
+.left p{font-size:14px;color:rgba(255,255,255,.6);line-height:1.7;margin-bottom:28px}
+
+/* Role selector */
+.role-selector{display:flex;flex-direction:column;gap:10px;margin-top:auto}
+.role-opt{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:12px 14px;cursor:pointer;transition:all .15s}
+.role-opt:hover,.role-opt.sel{background:rgba(37,99,235,.25);border-color:rgba(37,99,235,.4)}
+.role-opt input{display:none}
+.role-emoji{font-size:22px;flex-shrink:0}
+.role-info{}
+.role-name{font-size:14px;font-weight:700;color:#fff}
+.role-desc-sm{font-size:11px;color:rgba(255,255,255,.5);margin-top:1px}
+
+/* Form */
+.form-title{font-size:22px;font-weight:800;color:var(--ink);margin-bottom:4px}
+.form-sub{font-size:14px;color:var(--muted);margin-bottom:24px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-group{margin-bottom:14px}
+.form-label{display:block;font-size:13px;font-weight:600;color:var(--ink);margin-bottom:6px}
+.form-label span{color:var(--red)}
+.form-control{width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:10px;font-size:14px;color:var(--ink);background:var(--surface);outline:none;transition:border-color .15s,box-shadow .15s;font-family:var(--font)}
+.form-control:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(37,99,235,.1);background:#fff}
+.form-hint{font-size:11px;color:var(--muted);margin-top:4px}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:12px;border-radius:10px;border:none;font-size:15px;font-weight:700;cursor:pointer;transition:all .15s;font-family:var(--font)}
+.btn-primary{background:var(--blue);color:#fff}
+.btn-primary:hover{background:var(--blue-d);transform:translateY(-1px);box-shadow:0 6px 18px rgba(37,99,235,.35)}
+.flash{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:8px;font-size:13px;font-weight:500;margin-bottom:12px;border:1px solid}
+.flash.error{background:#FEF2F2;color:#7F1D1D;border-color:#FECACA}
+.flash.success{background:#F0FDF4;color:#065F46;border-color:#A7F3D0}
+.back-link{position:fixed;top:20px;left:20px;z-index:10;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;padding:8px 14px;border-radius:8px;font-size:13px;font-weight:600;backdrop-filter:blur(8px);transition:background .15s}
+.back-link:hover{background:rgba(255,255,255,.2)}
+a{text-decoration:none;color:var(--blue);font-weight:600}
+a:hover{text-decoration:underline}
+.divider{display:flex;align-items:center;gap:12px;margin:18px 0;color:var(--muted);font-size:12px}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
+@media(max-width:700px){.wrap{grid-template-columns:1fr}.left{display:none}}
+</style>
+</head>
+<body>
+<a href="{{ url_for('index') }}" class="back-link">← Inicio</a>
+
+<div class="wrap">
+  <div class="left">
+    <div>
+      <div class="logo"><div class="logo-icon">M</div>Merca<span>Red</span><small>AI</small></div>
+      <h2>Únete al ecosistema digital de Bolivia</h2>
+      <p>Elige tu rol en la plataforma y comienza a conectar tu negocio con el mercado.</p>
+    </div>
+    <div class="role-selector" id="roleCards">
+      <label class="role-opt sel" onclick="setRole('buyer')">
+        <input type="radio" name="roleVis" value="buyer" checked>
+        <div class="role-emoji">🏪</div>
+        <div class="role-info"><div class="role-name">Comprador</div><div class="role-desc-sm">Tiendas, cafeterías, restaurantes</div></div>
+      </label>
+      <label class="role-opt" onclick="setRole('seller')">
+        <input type="radio" name="roleVis" value="seller">
+        <div class="role-emoji">🏭</div>
+        <div class="role-info"><div class="role-name">Distribuidor</div><div class="role-desc-sm">Fabricantes, mayoristas, importadores</div></div>
+      </label>
+      <label class="role-opt" onclick="setRole('transporter')">
+        <input type="radio" name="roleVis" value="transporter">
+        <div class="role-emoji">🚚</div>
+        <div class="role-info"><div class="role-name">Transportista</div><div class="role-desc-sm">Empresas o conductores independientes</div></div>
+      </label>
+    </div>
+  </div>
+
+  <div class="right">
+    <div class="form-title">Crear cuenta gratis</div>
+    <div class="form-sub">Completa tus datos para empezar</div>
+
+    {% with msgs = get_flashed_messages(with_categories=true) %}
+      {% for cat, msg in msgs %}
+        <div class="flash {{ cat }}">{% if cat=='error' %}❌{% else %}✅{% endif %} {{ msg }}</div>
+      {% endfor %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('register') }}" id="regForm">
+      <!-- Role hidden -->
+      <input type="hidden" name="role" id="roleInput" value="buyer">
+
+      <div class="row">
+        <div class="form-group">
+          <label class="form-label">Nombre completo <span>*</span></label>
+          <input type="text" name="full_name" class="form-control" placeholder="Carlos Mamani" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Ciudad</label>
+          <select name="city" class="form-control">
+            <option>La Paz</option><option>El Alto</option><option>Cochabamba</option>
+            <option>Santa Cruz</option><option>Oruro</option><option>Sucre</option>
+            <option>Potosí</option><option>Trinidad</option><option>Cobija</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Nombre del negocio / empresa</label>
+        <input type="text" name="company" class="form-control" placeholder="Tienda San Martín">
+      </div>
+
+      <div class="row">
+        <div class="form-group">
+          <label class="form-label">Correo electrónico <span>*</span></label>
+          <input type="email" name="email" class="form-control" placeholder="tu@correo.com" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Teléfono</label>
+          <input type="tel" name="phone" class="form-control" placeholder="+591-7XXXXXXX">
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="form-group">
+          <label class="form-label">Contraseña <span>*</span></label>
+          <input type="password" name="password" id="pw" class="form-control" placeholder="Mín. 6 caracteres" required minlength="6">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Confirmar contraseña <span>*</span></label>
+          <input type="password" name="password2" id="pw2" class="form-control" placeholder="Repite la contraseña" required>
+        </div>
+      </div>
+      <div class="form-hint" id="pwMatch" style="margin-bottom:12px"></div>
+
+      <button type="submit" class="btn btn-primary">Crear cuenta →</button>
+      <div class="divider">o</div>
+      <p style="text-align:center;font-size:14px;color:var(--muted)">
+        ¿Ya tienes cuenta? <a href="{{ url_for('login') }}">Iniciar sesión</a>
+      </p>
+    </form>
+  </div>
+</div>
+
+<script>
+function setRole(r){
+  document.getElementById('roleInput').value = r;
+  document.querySelectorAll('.role-opt').forEach(el => {
+    el.classList.toggle('sel', el.querySelector('input').value === r);
+  });
+}
+// Password match
+const pw = document.getElementById('pw'), pw2 = document.getElementById('pw2'), hint = document.getElementById('pwMatch');
+function checkPw(){
+  if(!pw2.value) return hint.textContent='';
+  if(pw.value===pw2.value){hint.textContent='✓ Las contraseñas coinciden';hint.style.color='#10B981'}
+  else{hint.textContent='✗ Las contraseñas no coinciden';hint.style.color='#EF4444'}
+}
+pw.addEventListener('input',checkPw); pw2.addEventListener('input',checkPw);
+</script>
+</body>
+</html>
+{% endblock %}
