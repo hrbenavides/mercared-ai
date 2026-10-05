@@ -148,5 +148,5 @@ Este proyecto está bajo la licencia **MIT**. Consulta el archivo [LICENSE](LICE
 ---
 
 <p align="center">
-  Hecho con ❤️ en Bolivia 🇧🇴
+  Hecho en Bolivia ❤️💛💚
 </p>
